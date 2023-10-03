@@ -2,8 +2,10 @@ package org.example;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class Client extends JFrame {
     private static final int WIDTH = 555;
@@ -18,9 +20,12 @@ public class Client extends JFrame {
     private final JPanel panelBotom = new JPanel(new BorderLayout());
     private final JButton btnSend = new JButton("Send");
     private final JButton btnLogin = new JButton("Login");
-    private final JTextField msgField = new JTextField();
+    private final JTextField msgField = new JTextField("Введите Ваше сообщение");
     private final JPanel panelTop = new JPanel(new GridLayout(2, 3));
     private JTextArea msgArea = new JTextArea();
+    private JScrollPane scrollLog = new JScrollPane(msgArea);
+    JPanel jPanelUserList = new JPanel(new FlowLayout());
+    private static final String FILENAME = "Log.txt";
 
     Client(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -38,25 +43,97 @@ public class Client extends JFrame {
 
         add(panelTop, BorderLayout.NORTH);
 
-        add(msgArea);
+        //add(msgArea);
+        msgField.grabFocus();
+        msgField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                msgField.setText("");
+            }
+        });
+
         msgArea.setEditable(false);
+        add(scrollLog);
+
+        String[] users = {"Pavel", "Ivan", "Mariia",
+                "Daria", "Oleg", "John", "Kate"};
+        JList<String> userList = new JList<>(users);
+        jPanelUserList.add(userList);
+        add(jPanelUserList, BorderLayout.EAST);
 
         panelBotom.add(msgField, BorderLayout.CENTER);
         panelBotom.add(btnSend, BorderLayout.EAST);
 
         add(panelBotom, BorderLayout.SOUTH);
 
-        btnSend.addActionListener(new ActionListener() {
+
+        btnLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                msgArea.setText(String.valueOf(readLogFromFile()));
+            }
+        });
+
+        msgField.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == KeyEvent.VK_ENTER){
+                    btnSend.doClick();
+                }
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
 
             }
         });
 
-
-
+        btnSend.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String res = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + ": " + msgField.getText() + "\n";
+                msgArea.append(res);
+                writeLogToFile(res);
+                //msgArea.setText("");
+            }
+        });
     }
 
+    private void writeLogToFile(String data){
+        try (FileWriter writer = new FileWriter(Client.FILENAME, true); BufferedWriter bwr = new BufferedWriter(writer)) {
+            bwr.write(data);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
 
+    private StringBuffer readLogFromFile() {
+        StringBuffer stringBuffer = new StringBuffer();
+        try (FileReader reader = new FileReader(Client.FILENAME); BufferedReader brr = new BufferedReader(reader)) {
+
+            String line = brr.readLine();
+            if (line == null || line.isBlank()) {
+                System.out.println("Log is empty.");
+                return stringBuffer.append("Log is empty.\n");
+            }
+
+            while (line != null) {
+                stringBuffer.append(line);
+                stringBuffer.append("\n");
+                line = brr.readLine();
+            }
+
+            return stringBuffer;
+
+        } catch (IOException ioe) {
+            System.out.println("Log file is not found: " + FILENAME);
+        }
+        return stringBuffer.append("Log file is not found: " + FILENAME + "\n");
+    }
 
 }

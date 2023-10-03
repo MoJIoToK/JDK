@@ -2,6 +2,8 @@ package org.example;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class Server extends JFrame {
     private static final int WIDTH = 555;
@@ -13,6 +15,7 @@ public class Server extends JFrame {
     private JButton btnStart = new JButton("Start");
     private JButton btnStop = new JButton("Stop");
     private JTextArea msgArea = new JTextArea();
+    private static boolean isServerWorking;
 
     Server(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -28,5 +31,31 @@ public class Server extends JFrame {
 
         add(msgArea);
         msgArea.setEditable(false);
+
+        btnStart.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (isServerWorking) {
+                    msgArea.setText("Server is already running.");
+                } else {
+                    msgArea.setText("Server is started.");;
+                }
+                isServerWorking = true;
+            }
+        });
+
+        btnStop.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if (!isServerWorking) {
+                    msgArea.setText("Server is already stopped.");
+                } else {
+                    msgArea.setText("Server stopped.");
+                }
+                isServerWorking = false;
+            }
+        });
+
     }
 }
