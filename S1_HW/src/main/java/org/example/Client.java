@@ -116,7 +116,6 @@ public class Client extends JFrame {
                     writeLogToFile(res);
                 }
 
-                //msgArea.setText("");
             }
         });
     }
