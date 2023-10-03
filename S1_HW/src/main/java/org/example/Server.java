@@ -12,12 +12,21 @@ public class Server extends JFrame {
     private static final int WINDOW_POSY = 250;
 
     private JPanel bottomPanel = new JPanel(new GridLayout(1, 2));
-    private JButton btnStart = new JButton("Start");
+    private JPanel topPanel = new JPanel(new BorderLayout());
+    private static JButton btnStart = new JButton("Start");
     private JButton btnStop = new JButton("Stop");
     private JTextArea msgArea = new JTextArea();
-    private static boolean isServerWorking;
+    private JTextField statusServer = new JTextField();
+    private JScrollPane scrollLog = new JScrollPane(msgArea);
+    protected static boolean isServerWorking;
+
+    private final String STATUS_OFF = "Server stopped";
+    private final String STATUS_YET_OFF = "Server is already stopped";
+    private final String STATUS_ON = "Server is started";
+    private final String STATUS_YET_ON = "Server is already running";
 
     Server(){
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(WIDTH, HEIGHT);
         setLocation(WINDOW_POSX, WINDOW_POSY);
@@ -29,16 +38,20 @@ public class Server extends JFrame {
         bottomPanel.add(btnStop);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        add(msgArea);
+        statusServer.setText(STATUS_OFF);
+        topPanel.add(statusServer);
+        add(topPanel, BorderLayout.NORTH);
         msgArea.setEditable(false);
+        add(scrollLog);
 
         btnStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (isServerWorking) {
-                    msgArea.setText("Server is already running.");
+                    statusServer.setText(STATUS_YET_ON);
                 } else {
-                    msgArea.setText("Server is started.");;
+                    statusServer.setText(STATUS_ON);
+                    msgArea.setText(String.valueOf(Client.readLogFromFile()));
                 }
                 isServerWorking = true;
             }
@@ -49,13 +62,14 @@ public class Server extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 if (!isServerWorking) {
-                    msgArea.setText("Server is already stopped.");
+                    statusServer.setText(STATUS_YET_OFF);
                 } else {
-                    msgArea.setText("Server stopped.");
+                    statusServer.setText(STATUS_OFF);
                 }
                 isServerWorking = false;
             }
         });
 
     }
+
 }

@@ -20,12 +20,15 @@ public class Client extends JFrame {
     private final JPanel panelBotom = new JPanel(new BorderLayout());
     private final JButton btnSend = new JButton("Send");
     private final JButton btnLogin = new JButton("Login");
+    private final JButton btnLogout = new JButton("Logout");
     private final JTextField msgField = new JTextField("Введите Ваше сообщение");
     private final JPanel panelTop = new JPanel(new GridLayout(2, 3));
     private JTextArea msgArea = new JTextArea();
     private JScrollPane scrollLog = new JScrollPane(msgArea);
     JPanel jPanelUserList = new JPanel(new FlowLayout());
     private static final String FILENAME = "Log.txt";
+    private static boolean isLogin = false;
+    Server server;
 
     Client(){
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -40,10 +43,9 @@ public class Client extends JFrame {
         panelTop.add(login);
         panelTop.add(password);
         panelTop.add(btnLogin);
-
+        panelTop.add(btnLogout);
         add(panelTop, BorderLayout.NORTH);
 
-        //add(msgArea);
         msgField.grabFocus();
         msgField.addFocusListener(new FocusAdapter() {
             @Override
@@ -66,11 +68,23 @@ public class Client extends JFrame {
 
         add(panelBotom, BorderLayout.SOUTH);
 
-
         btnLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                msgArea.setText(String.valueOf(readLogFromFile()));
+                isLogin = true;
+                if (server.isServerWorking){
+                    msgArea.setText(String.valueOf(readLogFromFile()));
+                } else {
+                    msgArea.setText("Server is stopped. Please try again later!");
+                }
+            }
+        });
+
+        btnLogout.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                isLogin = false;
+                msgArea.setText("");
             }
         });
 
@@ -98,13 +112,16 @@ public class Client extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String res = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + ": " + msgField.getText() + "\n";
                 msgArea.append(res);
-                writeLogToFile(res);
+                if (server.isServerWorking && isLogin) {
+                    writeLogToFile(res);
+                }
+
                 //msgArea.setText("");
             }
         });
     }
 
-    private void writeLogToFile(String data){
+    protected void writeLogToFile(String data){
         try (FileWriter writer = new FileWriter(Client.FILENAME, true); BufferedWriter bwr = new BufferedWriter(writer)) {
             bwr.write(data);
         } catch (IOException ioe) {
@@ -112,7 +129,7 @@ public class Client extends JFrame {
         }
     }
 
-    private StringBuffer readLogFromFile() {
+    protected static StringBuffer readLogFromFile() {
         StringBuffer stringBuffer = new StringBuffer();
         try (FileReader reader = new FileReader(Client.FILENAME); BufferedReader brr = new BufferedReader(reader)) {
 
