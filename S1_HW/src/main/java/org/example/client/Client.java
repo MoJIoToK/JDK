@@ -1,8 +1,6 @@
 package org.example.client;
 
-import org.example.Server;
-
-
+import org.example.server.Server;
 
 public class Client  {
 
@@ -12,33 +10,35 @@ public class Client  {
     Server server;
     private String name;
 
-    Client(ClientView clientView,Server server){
+    Client(ClientView clientView, Server server){
         this.clientView = clientView;
         this.server = server;
     }
 
-    private boolean connectToServer(String name){
+    public boolean connectToServer(String name){
         this.name = name;
         if (server.connectUser(this)){
-            appendLog("You are successfully connected!\n");
             isLogin = true;
             String log = server.getLog();
             if (log != null){
-                appendLog(log);
+                printText(log);
+                printText("You are successfully connected!");
+            } else {
+                printText("You are successfully connected!");
             }
             return true;
         } else {
-            appendLog("Подключение не удалось");
+            printText("Подключение не удалось");
         }
         return false;
     }
 
-    public void disconnectFromServer(){
+    public void disconnect(){
         if (isLogin){
             isLogin = false;
-            clientView.disconnectFromServer();
+            //clientView.disconnectFromServer();
             server.disconnectUser(this);
-            appendLog("Вы были отключены от сервера!");
+            printText("Вы были отключены от сервера!");
         }
     }
 
@@ -48,49 +48,16 @@ public class Client  {
                 server.message(name + ": " + message);
             }
         } else {
-            appendLog("Нет подключения к серверу");
+            printText("Нет подключения к серверу");
         }
     }
 
     public void serverAnswer(String text){
-        appendLog(text);
+        printText(text);
     }
 
-    private void appendLog(String text){
+    private void printText(String text){
         clientView.showMessage(text);
     }
-
-
-//    protected void writeLogToFile(String data){
-//        try (FileWriter writer = new FileWriter(Client.FILENAME, true); BufferedWriter bwr = new BufferedWriter(writer)) {
-//            bwr.write(data);
-//        } catch (IOException ioe) {
-//            ioe.printStackTrace();
-//        }
-//    }
-
-//    protected static StringBuffer readLogFromFile() {
-//        StringBuffer stringBuffer = new StringBuffer();
-//        try (FileReader reader = new FileReader(Client.FILENAME); BufferedReader brr = new BufferedReader(reader)) {
-//
-//            String line = brr.readLine();
-//            if (line == null || line.isBlank()) {
-//                System.out.println("Log is empty.");
-//                return stringBuffer.append("Log is empty.\n");
-//            }
-//
-//            while (line != null) {
-//                stringBuffer.append(line);
-//                stringBuffer.append("\n");
-//                line = brr.readLine();
-//            }
-//
-//            return stringBuffer;
-//
-//        } catch (IOException ioe) {
-//            System.out.println("Log file is not found: " + FILENAME);
-//        }
-//        return stringBuffer.append("Log file is not found: " + FILENAME + "\n");
-//    }
 
 }

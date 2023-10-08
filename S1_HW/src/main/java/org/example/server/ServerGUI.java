@@ -1,4 +1,4 @@
-package org.example;
+package org.example.server;
 
 import org.example.client.Client;
 
@@ -10,7 +10,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 
-public class Server extends JFrame {
+public class ServerGUI extends JFrame implements ServerView{
     private static final int WIDTH = 555;
     private static final int HEIGHT = 507;
     private static final int WINDOW_POSX = 1000;
@@ -29,18 +29,15 @@ public class Server extends JFrame {
     private final String STATUS_YET_OFF = "Server is already stopped";
     private final String STATUS_ON = "Server is started";
     private final String STATUS_YET_ON = "Server is already running";
-    ArrayList<Client> clientList;
-    public static final String LOG_PATH = "Log.txt";
+    private Server server;
 
-    Server(){
-        clientList = new ArrayList<>();
-
+    public ServerGUI(){
+        this.server = new Server(this);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(WIDTH, HEIGHT);
         setLocation(WINDOW_POSX, WINDOW_POSY);
         setAlwaysOnTop(true);
         setTitle("Chat server");
-
         createPanel();
         setVisible(true);
     }
@@ -50,7 +47,6 @@ public class Server extends JFrame {
         msgArea.setEditable(false);
         add(scrollLog);
         add(createTopPanel(), BorderLayout.NORTH);
-
     }
 
     private Component createTopPanel() {
@@ -69,7 +65,7 @@ public class Server extends JFrame {
                     statusServer.setText(STATUS_YET_ON);
                 } else {
                     statusServer.setText(STATUS_ON);
-                    msgArea.setText(readLog());
+                    msgArea.setText(server.getLog());
                 }
                 isServerWorking = true;
             }
@@ -90,67 +86,71 @@ public class Server extends JFrame {
         return bottomPanel;
     }
 
-    public boolean connectUser(Client client){
-        if(!isServerWorking){
-            return false;
-        }
-        clientList.add(client);
-        return true;
-    }
+//    public boolean connectUser(Client client){
+//        if(!isServerWorking){
+//            return false;
+//        }
+//        clientList.add(client);
+//        return true;
+//    }
 
-    public void disconnectUser(Client client){
-        clientList.remove(client);
-        if(clientList != null){
-            client.disconnectFromServer();
-        }
-    }
+//    public void disconnectUser(Client client){
+//        clientList.remove(client);
+//        if(clientList != null){
+//            client.disconnect();
+//        }
+//    }
 
-    public void message(String text){
-        if (!isServerWorking){
-            return;
-        }
-        text +="";
-        appendLog(text);
-        answerAll(text);
-        saveInLog(text);
-    }
+//    public void message(String text){
+//        if (!isServerWorking){
+//            return;
+//        }
+//        text +="";
+//        appendLog(text);
+//        answerAll(text);
+//        saveInLog(text);
+//    }
 
-    private void answerAll(String text){
-        for (Client client: clientList){
-            client.answer(text);
-        }
-    }
+//    private void answerAll(String text){
+//        for (Client client: clientList){
+//            client.serverAnswer(text);
+//        }
+//    }
 
-    private void appendLog(String text){
+//    private void appendLog(String text){
+//        msgArea.append(text + "\n");
+//    }
+
+//    public String getLog() {
+//        return readLog();
+//    }
+
+//    private void saveInLog(String text){
+//        try (FileWriter writer = new FileWriter(LOG_PATH, true)){
+//            writer.write(text);
+//            writer.write("\n");
+//        } catch (Exception e){
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    private String readLog(){
+//        StringBuilder stringBuilder = new StringBuilder();
+//        try (FileReader reader = new FileReader(LOG_PATH);){
+//            int c;
+//            while ((c = reader.read()) != -1){
+//                stringBuilder.append((char) c);
+//            }
+//            stringBuilder.delete(stringBuilder.length()-1, stringBuilder.length());
+//            return stringBuilder.toString();
+//        } catch (Exception e){
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
+
+    @Override
+    public void showLog(String text) {
         msgArea.append(text + "\n");
     }
-
-    public String getLog() {
-        return readLog();
-    }
-
-    private void saveInLog(String text){
-        try (FileWriter writer = new FileWriter(LOG_PATH, true)){
-            writer.write(text);
-            writer.write("\n");
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    private String readLog(){
-        StringBuilder stringBuilder = new StringBuilder();
-        try (FileReader reader = new FileReader(LOG_PATH);){
-            int c;
-            while ((c = reader.read()) != -1){
-                stringBuilder.append((char) c);
-            }
-            stringBuilder.delete(stringBuilder.length()-1, stringBuilder.length());
-            return stringBuilder.toString();
-        } catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
-    }
-
 }

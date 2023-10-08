@@ -1,6 +1,7 @@
 package org.example.client;
 
-import org.example.Server;
+import org.example.server.Server;
+import org.example.server.ServerGUI;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,15 +25,13 @@ public class ClientGUI extends JFrame implements ClientView {
     private final JPanel panelTop = new JPanel(new GridLayout(2, 3));
     private JTextArea msgArea = new JTextArea();
     private JScrollPane scrollLog = new JScrollPane(msgArea);
-    //JPanel jPanelUserList = new JPanel(new FlowLayout());
-    private static final String FILENAME = "Log.txt";
     private static boolean isLogin = false;
     Server server;
     private String name;
+    private Client client;
 
-    ClientGUI(Server server){
-        this.server = server;
-
+    public ClientGUI(Server server){
+        this.client = new Client(this, server);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(WIDTH, HEIGHT);
         setLocation(WINDOW_POSX, WINDOW_POSY);
@@ -59,21 +58,12 @@ public class ClientGUI extends JFrame implements ClientView {
             @Override
             public void actionPerformed(ActionEvent e) {
                 connectToServer();
-//                isLogin = true;
-//                if (server.isServerWorking){
-//                    msgArea.setText(String.valueOf(readLogFromFile()));
-//                } else {
-//                    msgArea.setText("Server is stopped. Please try again later!");
-//                }
             }
         });
-
         btnLogout.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 disconnectFromServer();
-//                isLogin = false;
-//                msgArea.setText("");
             }
         });
         return panelTop;
@@ -109,83 +99,24 @@ public class ClientGUI extends JFrame implements ClientView {
     }
 
     private void connectToServer(){
-        if (server.connectUser(this)){
-            appendLog("You are successfully connected!\n");
-            isLogin = true;
-            name = login.getText();
-            String log = server.getLog();
-            if (log != null){
-                appendLog(log);
-            }
-        } else {
-            appendLog("Подключение не удалось");
-        }
+        client.connectToServer(login.getText());
     }
 
     @Override
     public void showMessage(String text) {
-
+        appendLog(text);
     }
 
     public void disconnectFromServer(){
-        if (isLogin){
-            isLogin = false;
-            server.disconnectUser(this);
-            appendLog("Вы были отключены от сервера!");
-        }
+        client.disconnect();
     }
 
     public void sendMessage(){
-        if (isLogin){
-            String text = msgField.getText();
-            if (!text.equals("")){
-                server.message(name + ": " + text);
-                //msgArea.setText("");
-            }
-        } else {
-            appendLog("Нет подключения к серверу");
-        }
-    }
-
-    public void answer(String text){
-        appendLog(text);
+        client.sendMessage(msgField.getText());
+        msgArea.setText("");
     }
 
     private void appendLog(String text){
         msgArea.append(text + "\n");
     }
-
-
-//    protected void writeLogToFile(String data){
-//        try (FileWriter writer = new FileWriter(Client.FILENAME, true); BufferedWriter bwr = new BufferedWriter(writer)) {
-//            bwr.write(data);
-//        } catch (IOException ioe) {
-//            ioe.printStackTrace();
-//        }
-//    }
-
-//    protected static StringBuffer readLogFromFile() {
-//        StringBuffer stringBuffer = new StringBuffer();
-//        try (FileReader reader = new FileReader(Client.FILENAME); BufferedReader brr = new BufferedReader(reader)) {
-//
-//            String line = brr.readLine();
-//            if (line == null || line.isBlank()) {
-//                System.out.println("Log is empty.");
-//                return stringBuffer.append("Log is empty.\n");
-//            }
-//
-//            while (line != null) {
-//                stringBuffer.append(line);
-//                stringBuffer.append("\n");
-//                line = brr.readLine();
-//            }
-//
-//            return stringBuffer;
-//
-//        } catch (IOException ioe) {
-//            System.out.println("Log file is not found: " + FILENAME);
-//        }
-//        return stringBuffer.append("Log file is not found: " + FILENAME + "\n");
-//    }
-
 }
