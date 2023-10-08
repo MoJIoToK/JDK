@@ -31,8 +31,9 @@ public class ServerGUI extends JFrame implements ServerView{
     private final String STATUS_YET_ON = "Server is already running";
     private Server server;
 
-    public ServerGUI(){
-        this.server = new Server(this);
+    public ServerGUI(Server server){
+        this.server = server;
+        //this.server = new Server(this);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(WIDTH, HEIGHT);
         setLocation(WINDOW_POSX, WINDOW_POSY);
@@ -61,6 +62,7 @@ public class ServerGUI extends JFrame implements ServerView{
         btnStart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+//                startServer();
                 if (isServerWorking) {
                     statusServer.setText(STATUS_YET_ON);
                 } else {
@@ -85,6 +87,10 @@ public class ServerGUI extends JFrame implements ServerView{
         });
         return bottomPanel;
     }
+
+//    private void startServer() {
+//        server.start();
+//    }
 
 //    public boolean connectUser(Client client){
 //        if(!isServerWorking){
@@ -152,5 +158,9 @@ public class ServerGUI extends JFrame implements ServerView{
     @Override
     public void showLog(String text) {
         msgArea.append(text + "\n");
+    }
+
+    public void setStatus(String text){
+        statusServer.setText(text);
     }
 }

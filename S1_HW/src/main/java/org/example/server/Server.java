@@ -23,8 +23,14 @@ public class Server {
 //    private JTextArea msgArea = new JTextArea();
 //    private JTextField statusServer = new JTextField();
 //    private JScrollPane scrollLog = new JScrollPane(msgArea);
+
+    private final String STATUS_OFF = "Server stopped";
+    private final String STATUS_YET_OFF = "Server is already stopped";
+    private final String STATUS_ON = "Server is started";
+    private final String STATUS_YET_ON = "Server is already running";
     protected static boolean isServerWorking;
     private ServerView serverView;
+    private ServerGUI serverGUI;
 //    private final String STATUS_OFF = "Server stopped";
 //    private final String STATUS_YET_OFF = "Server is already stopped";
 //    private final String STATUS_ON = "Server is started";
@@ -32,8 +38,8 @@ public class Server {
     ArrayList<Client> clientList;
     public static final String LOG_PATH = "Log.txt";
 
-    public Server(ServerView serverView){
-        this.serverView = serverView;
+    public Server(){
+        this.serverView = new ServerGUI(this);
         clientList = new ArrayList<>();
 //        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        setSize(WIDTH, HEIGHT);
@@ -91,7 +97,7 @@ public class Server {
 //    }
 
     public boolean connectUser(Client client){
-        if(!isServerWorking){
+        if(!serverGUI.isServerWorking){
             return false;
         }
         clientList.add(client);
@@ -154,4 +160,13 @@ public class Server {
         }
     }
 
+//    public void start() {
+//        if (isServerWorking) {
+//            serverGUI.setStatus(STATUS_YET_ON);
+//        } else {
+//            serverGUI.setStatus(STATUS_ON);
+//            serverView.showLog(getLog());
+//        }
+//        isServerWorking = true;
+//    }
 }

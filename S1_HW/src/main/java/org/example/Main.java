@@ -8,9 +8,10 @@ import org.example.server.ServerView;
 public class Main {
 
     public static void main(String[] args) {
-        //ServerView serverView = new ServerGUI();
-        ServerGUI serverGUI = new ServerGUI();
-        Server server = new Server(serverGUI);
+        Server server = new Server();
+//        //ServerView serverView = new ServerGUI();
+//        ServerGUI serverGUI = new ServerGUI();
+//        Server server = new Server(serverGUI);
         new ClientGUI(server);
         System.out.println("Method main() is over");
     }

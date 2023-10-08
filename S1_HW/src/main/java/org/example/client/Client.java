@@ -28,6 +28,7 @@ public class Client  {
             }
             return true;
         } else {
+            System.out.println("Херня");
             printText("Подключение не удалось");
         }
         return false;
