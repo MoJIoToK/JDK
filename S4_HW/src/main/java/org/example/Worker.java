@@ -2,16 +2,20 @@ package org.example;
 
 public class Worker {
 
-    private int number;
+    private Integer number;
     private String phone;
     private String name;
     private String experience;
 
-    public Worker(int number, String phone, String name, String experience) {
+    public Worker(Integer number, String phone, String name, String experience) {
         this.number = number;
         this.phone = phone;
         this.name = name;
         this.experience = experience;
+    }
+
+    public Integer getNumber() {
+        return number;
     }
 
     public String getName() {
