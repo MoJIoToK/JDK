@@ -1,53 +1,55 @@
 package org.example;
 
-import java.util.concurrent.Semaphore;
+import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 
-public class Philosopher implements Runnable {
-    private final static int EATING_TIME = 1000;
-    private final static int THINKING_TIME = 1000;
-    private final static int COUNT_PHILOSOPHER = 5;
+public class Philosopher extends Thread {
+    private final String name;
+    private final int leftFork;
+    private final int rightFork;
+    private int countEat;
+    private final Random random;
+    private final CountDownLatch cdl;
+    private final Table table;
 
-    private int ID;
-    private int counter = 3;
-    private Semaphore s;
-
-    public Philosopher(Semaphore s, int id) {
-        this.s = s;
-        this.ID = id;
+    public Philosopher(String name, Table table, int leftFork, int rightFork, CountDownLatch cdl) {
+        this.name = name;
+        this.table = table;
+        this.leftFork = leftFork;
+        this.rightFork = rightFork;
+        this.cdl = cdl;
+        countEat = 0;
+        random = new Random();
     }
-
-    public void printLog(String message){
-        System.out.println("Philosopher " + ID + " " + message);
-    }
-
 
     @Override
     public synchronized void run() {
-        while(counter <= COUNT_PHILOSOPHER){
-            eat();
-            think();
+        while (countEat < 3) {
+            try {
+                thinking();
+                eating();
+            } catch (InterruptedException e) {
+                e.fillInStackTrace();
+            }
         }
+
+        System.out.println(name + " наелся до отвала");
+        cdl.countDown();
     }
 
-    public void think(){
-        s.release();
-        printLog("is thinking");
-
-        try {
-            Thread.sleep(THINKING_TIME);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public void thinking() throws InterruptedException {
+        sleep(random.nextLong(100, 2000));
     }
 
-    public void eat(){
-        try {
-            s.acquire();
-            printLog("is eating");
-            Thread.sleep(EATING_TIME);
-            counter++;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    public void eating() throws InterruptedException {
+        if (table.tryGetForks(leftFork, rightFork)) {
+            System.out.println(name + " уплетает вермишель, используя вилки: " + leftFork
+                    + " и " + rightFork);
+            sleep(random.nextLong(3000, 6000));
+            table.putForks(leftFork, rightFork);
+            System.out.println(name + " покушал, можно и помыслить. " +
+                    "Не забыв при этом вернуть вилки " + leftFork + " и " + rightFork);
+            countEat++;
         }
     }
 }

@@ -1,11 +1,13 @@
 package org.example;
 
 public class Fork {
-    private boolean isUsing;
-    private int number;
+    private boolean using;
 
-    public Fork(int number) {
-        this.isUsing = false;
-        this.number = number;
+    public boolean isUsing(){
+        return using;
+    }
+
+    public void setUsing(boolean using) {
+        this.using = using;
     }
 }
